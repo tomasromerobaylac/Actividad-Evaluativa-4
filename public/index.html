@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Mercado Fresco: almacén de barrio online. Elegí tus productos, armá tu pedido y recibilo en el día.">
+<title>Mercado Fresco — Almacén de barrio online</title>
+<link rel="icon" href="img/icono.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<!-- Primer elemento enfocable: permite saltear el encabezado con el teclado -->
+<a class="saltar-contenido" href="#contenido">Saltar al contenido principal</a>
+
+<!-- ===== ENCABEZADO: franja informativa (topbar) + barra de navegación, ambas dentro de <header> ===== -->
+<header class="encabezado">
+  <!-- Franja superior informativa: forma parte del <header> -->
+  <div class="topbar">
+    <div class="contenedor">
+      <span>Retiro en el local o envío a domicilio en el día</span>
+      <span>Lun a Sáb 8:00–21:00 · San Martín 452</span>
+    </div>
+  </div>
+
+  <!-- Marca y menú principal (el menú lo dibuja app.js según la sesión) -->
+  <div class="barra-nav">
+    <div class="contenedor">
+      <a href="#/" class="marca">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true" focusable="false">
+          <rect width="34" height="34" rx="4" fill="#16281C"/>
+          <path d="M9 13h16l-1.6 10.4a2 2 0 0 1-2 1.6H12.6a2 2 0 0 1-2-1.6L9 13Z" stroke="#E8A93B" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M13 13v-1.5a4 4 0 0 1 8 0V13" stroke="#E8A93B" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span>Mercado Fresco<small>Almacén de barrio</small></span>
+      </a>
+
+      <nav aria-label="Principal">
+        <ul id="menu" class="menu">
+          <!-- Los enlaces los dibuja app.js según el estado de la sesión -->
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- Región de estado: los avisos (éxito/error) se leen en voz alta sin mover el foco -->
+<div id="aviso" class="aviso" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ===== CONTENIDO PRINCIPAL: app.js monta aquí la vista activa (SPA) ===== -->
+<main id="contenido" tabindex="-1">
+  <p class="cargando">Cargando…</p>
+</main>
+
+<!-- ===== PIE DE PÁGINA ===== -->
+<footer class="pie">
+  <div class="contenedor">
+    <p>Mercado Fresco · San Martín 452 · Lun a Sáb 8:00–21:00</p>
+    <p>Trabajo integrador AE4 — Paradigmas y Lenguajes de Programación III · Universidad de la Cuenca del Plata</p>
+  </div>
+</footer>
+
+<!-- ================= Plantillas de vistas (no se renderizan hasta que app.js las clona) ================= -->
+
+<!-- Vista Inicio: portada, franja de ofertas y grilla de rubros -->
+<template id="vista-inicio">
+  <!-- Hero: mensaje principal y accesos directos -->
+  <section class="hero">
+    <div class="contenedor hero-grid">
+      <div>
+        <p class="eyebrow">Desde 1998 en el barrio</p>
+        <h1 data-foco>Lo fresco de la verdulería, con la comodidad de pedirlo online.</h1>
+        <p>Frutas, verduras, almacén, lácteos y bebidas seleccionadas cada mañana. Armá tu pedido y lo tenés en la puerta de tu casa el mismo día.</p>
+        <div class="acciones">
+          <a href="#/catalogo" class="btn btn-mostaza">Ver catálogo</a>
+          <a href="#/carrito" class="btn btn-borde-claro">Hacer mi pedido</a>
+        </div>
+      </div>
+      <div class="hero-figura" aria-hidden="true">
+        <div>🍅</div><div>🥬</div><div>🧀</div><div>🍞</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Franja de ofertas -->
+  <section class="ofertas" aria-label="Ofertas de la semana">
+    <div class="contenedor">
+      <p><span class="insignia">2x1 esta semana</span> Frutas de estación con hasta 20% de descuento pagando en efectivo.</p>
+      <a href="#/ofertas" class="btn btn-borde">Ver todas las ofertas</a>
+    </div>
+  </section>
+
+  <section class="seccion contenedor" aria-labelledby="t-rubros">
+    <h2 id="t-rubros">Comprá por rubro</h2>
+    <p>Elegí un rubro para ver precios y disponibilidad de stock.</p>
+    <ul id="lista-rubros" class="grilla-rubros" aria-live="polite" aria-busy="true"></ul>
+  </section>
+</template>
+
+<!-- Vista Catálogo / Ofertas: filtros por rubro y listado en tarjetas o tabla -->
+<template id="vista-catalogo">
+  <section class="seccion contenedor" aria-labelledby="t-catalogo">
+    <h1 id="t-catalogo" data-foco>Catálogo</h1>
+    <p id="catalogo-desc"></p>
+    <nav aria-label="Filtrar por rubro">
+      <ul id="filtros" class="filtros"></ul>
+    </nav>
+    <div class="barra-listado">
+      <p id="resultado-cantidad" class="resultado-cantidad" aria-live="polite"></p>
+      <!-- Conmutador de formato (heredado de AE1: listado_box.html / listado_tabla.html) -->
+      <div class="conmutador" role="group" aria-label="Formato del listado">
+        <button type="button" id="ver-tarjetas" class="btn btn-borde btn-chico" aria-pressed="true">Tarjetas</button>
+        <button type="button" id="ver-tabla" class="btn btn-borde btn-chico" aria-pressed="false">Tabla</button>
+      </div>
+    </div>
+    <ul id="lista-productos" class="grilla-productos" aria-live="polite" aria-busy="true"></ul>
+    <div id="tabla-catalogo" aria-live="polite" hidden></div>
+  </section>
+</template>
+
+<!-- Vista Ficha de producto -->
+<template id="vista-producto">
+  <section class="seccion contenedor" aria-labelledby="t-producto">
+    <p><a href="#/catalogo" class="enlace-volver">← Volver al catálogo</a></p>
+    <div id="ficha" class="ficha" aria-live="polite" aria-busy="true">
+      <h1 id="t-producto" data-foco>Cargando producto…</h1>
+    </div>
+  </section>
+</template>
+
+<!-- Vista Finalizar compra: formulario de entrega y resumen del pedido -->
+<template id="vista-carrito">
+  <section class="seccion contenedor" aria-labelledby="t-carrito">
+    <h1 id="t-carrito" data-foco>Finalizar compra</h1>
+    <p>Revisá tu pedido y completá los datos de entrega.</p>
+    <div id="carrito-sesion" aria-live="polite"></div>
+
+    <!-- Dos columnas: formulario (izquierda) y resumen del pedido (derecha); en móvil se apilan -->
+    <div class="checkout">
+      <div class="tarjeta">
+        <h2>Datos de entrega</h2>
+        <form id="form-pedido" novalidate>
+          <fieldset>
+            <legend>Datos del cliente</legend>
+            <div class="campo">
+              <label for="p-nombre">Nombre y apellido</label>
+              <input id="p-nombre" name="nombre" type="text" autocomplete="name" required aria-describedby="e-p-nombre" placeholder="Ej: María Gómez">
+              <p id="e-p-nombre" class="error-campo"></p>
+            </div>
+            <div class="campo">
+              <label for="p-direccion">Dirección de entrega</label>
+              <input id="p-direccion" name="direccion" type="text" autocomplete="street-address" required aria-describedby="e-p-direccion" placeholder="Calle, número, piso/depto">
+              <p id="e-p-direccion" class="error-campo"></p>
+            </div>
+            <div class="campo">
+              <label for="p-telefono">Teléfono</label>
+              <input id="p-telefono" name="telefono" type="tel" autocomplete="tel" required aria-describedby="e-p-telefono" placeholder="Ej: 3764 123456">
+              <p id="e-p-telefono" class="error-campo"></p>
+            </div>
+            <div class="campo">
+              <label for="p-email">E-mail</label>
+              <input id="p-email" name="email" type="email" autocomplete="email" required aria-describedby="e-p-email" placeholder="Ej: nombre@correo.com">
+              <p id="e-p-email" class="error-campo"></p>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Medio de pago</legend>
+            <div class="opciones-pago">
+              <label class="opcion"><input type="radio" name="pago" value="efectivo" checked> Efectivo</label>
+              <label class="opcion"><input type="radio" name="pago" value="tarjeta"> Tarjeta</label>
+              <label class="opcion"><input type="radio" name="pago" value="transferencia"> Transferencia</label>
+            </div>
+          </fieldset>
+
+          <div class="campo">
+            <label for="p-notas">Aclaraciones para la entrega <span class="sub">(opcional)</span></label>
+            <textarea id="p-notas" name="notas" rows="3" maxlength="300" placeholder="Ej: dejar el pedido en portería"></textarea>
+          </div>
+
+          <p id="error-pedido" class="error-form"></p>
+          <button type="submit" class="btn btn-mostaza btn-bloque">Confirmar pedido</button>
+        </form>
+      </div>
+
+      <section class="tarjeta" aria-labelledby="t-resumen">
+        <h2 id="t-resumen" tabindex="-1">Tu pedido</h2>
+        <ul id="carrito-lista" class="carrito-lista" aria-live="polite"></ul>
+        <p id="carrito-vacio" class="sub" hidden>Todavía no agregaste productos. Explorá el <a href="#/catalogo">catálogo</a> para armar tu pedido.</p>
+        <form id="form-cupon" class="cupon" novalidate>
+          <label for="p-cupon">Código de descuento</label>
+          <div class="cupon-fila">
+            <input id="p-cupon" type="text" autocomplete="off" placeholder="Ej: UCP10">
+            <button type="submit" class="btn btn-borde">Aplicar</button>
+          </div>
+        </form>
+        <dl class="totales" aria-live="polite">
+          <div><dt>Subtotal</dt><dd id="t-subtotal">$0</dd></div>
+          <div id="fila-descuento" hidden><dt>Descuento (10%)</dt><dd id="t-descuento">-$0</dd></div>
+          <div><dt>Envío</dt><dd id="t-envio">$800</dd></div>
+          <div class="total"><dt>Total</dt><dd id="t-total">$0</dd></div>
+        </dl>
+      </section>
+    </div>
+  </section>
+</template>
+
+<!-- Vista Pedido confirmado -->
+<template id="vista-confirmacion">
+  <section class="seccion contenedor" aria-labelledby="t-confirmado">
+    <div class="tarjeta confirmacion">
+      <h1 id="t-confirmado" data-foco>¡Pedido confirmado!</h1>
+      <p id="confirmacion-texto"></p>
+      <a href="#/catalogo" class="btn btn-mostaza">Seguir comprando</a>
+    </div>
+  </section>
+</template>
+
+<!-- Vista Mi cuenta: ingreso, registro y pedidos del cliente -->
+<template id="vista-cuenta">
+  <section class="seccion contenedor" aria-labelledby="t-cuenta">
+    <h1 id="t-cuenta" data-foco>Mi cuenta</h1>
+
+    <div id="cuenta-invitado" class="dos-columnas" hidden>
+      <div class="tarjeta">
+        <h2>Iniciar sesión</h2>
+        <form id="form-login" novalidate>
+          <div class="campo">
+            <label for="l-email">E-mail</label>
+            <input id="l-email" name="email" type="email" autocomplete="username" required>
+          </div>
+          <div class="campo">
+            <label for="l-clave">Contraseña</label>
+            <input id="l-clave" name="password" type="password" autocomplete="current-password" required>
+          </div>
+          <p id="error-login" class="error-form"></p>
+          <button type="submit" class="btn btn-mostaza btn-bloque">Ingresar</button>
+        </form>
+      </div>
+      <div class="tarjeta">
+        <h2>Crear cuenta</h2>
+        <form id="form-registro" novalidate>
+          <div class="campo">
+            <label for="r-nombre">Nombre y apellido</label>
+            <input id="r-nombre" name="nombre" type="text" autocomplete="name" required>
+          </div>
+          <div class="campo">
+            <label for="r-email">E-mail</label>
+            <input id="r-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="campo">
+            <label for="r-clave">Contraseña</label>
+            <input id="r-clave" name="password" type="password" autocomplete="new-password" required aria-describedby="ayuda-clave" minlength="8">
+            <p id="ayuda-clave" class="sub">Mínimo 8 caracteres.</p>
+          </div>
+          <p id="error-registro" class="error-form"></p>
+          <button type="submit" class="btn btn-borde btn-bloque">Crear cuenta</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="cuenta-panel" hidden>
+      <p id="cuenta-saludo"></p>
+      <p id="cuenta-acciones" class="acciones"></p>
+      <h2>Mis pedidos</h2>
+      <div id="mis-pedidos" aria-live="polite" aria-busy="true"></div>
+    </div>
+  </section>
+</template>
+
+<!-- Vista Gestión de productos (sólo personal): alta, edición, baja e inventario -->
+<template id="vista-admin">
+  <section class="seccion contenedor" aria-labelledby="t-admin">
+    <h1 id="t-admin" data-foco>Gestión de productos</h1>
+    <p>Alta, modificación y baja de productos del local. Sólo disponible para personal.</p>
+
+    <div class="tarjeta">
+      <h2 id="t-form-producto">Nuevo producto</h2>
+      <form id="form-producto" novalidate aria-labelledby="t-form-producto">
+        <div class="grilla-form">
+          <div class="campo">
+            <label for="a-nombre">Nombre</label>
+            <input id="a-nombre" name="nombre" type="text" required maxlength="120">
+          </div>
+          <div class="campo">
+            <label for="a-categoria">Rubro</label>
+            <select id="a-categoria" name="categoria_id" required></select>
+          </div>
+          <div class="campo">
+            <label for="a-precio">Precio ($)</label>
+            <input id="a-precio" name="precio" type="number" min="1" step="0.01" required inputmode="decimal">
+          </div>
+          <div class="campo">
+            <label for="a-unidad">Unidad</label>
+            <select id="a-unidad" name="unidad" required>
+              <option value="kg">kg</option><option value="un.">un.</option><option value="l">l</option>
+              <option value="g">g</option><option value="doc.">doc.</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="a-emoji">Emoji</label>
+            <input id="a-emoji" name="emoji" type="text" maxlength="4" autocomplete="off">
+          </div>
+          <div class="campo">
+            <label for="a-stock">Stock</label>
+            <input id="a-stock" name="stock" type="number" min="0" step="1" required inputmode="numeric">
+          </div>
+          <div class="campo">
+            <label for="a-minimo">Stock mínimo</label>
+            <input id="a-minimo" name="stock_minimo" type="number" min="0" step="1" required inputmode="numeric" value="5">
+          </div>
+          <div class="campo campo-check">
+            <label class="opcion"><input id="a-oferta" name="oferta" type="checkbox"> En oferta</label>
+          </div>
+        </div>
+        <p id="error-producto" class="error-form"></p>
+        <div class="acciones">
+          <button type="submit" id="btn-guardar" class="btn btn-mostaza">Guardar producto</button>
+          <button type="button" id="btn-cancelar" class="btn btn-borde" hidden>Cancelar edición</button>
+        </div>
+      </form>
+    </div>
+
+    <h2 id="t-inventario" tabindex="-1">Inventario</h2>
+    <div id="tabla-productos" aria-live="polite" aria-busy="true"></div>
+
+    <h2>Pedidos recientes</h2>
+    <div id="admin-pedidos" aria-live="polite" aria-busy="true"></div>
+  </section>
+</template>
+
+<!-- Vista de dirección inexistente -->
+<template id="vista-404">
+  <section class="seccion contenedor">
+    <h1 data-foco>Página no encontrada</h1>
+    <p>La dirección que buscás no existe. <a href="#/">Volver al inicio</a>.</p>
+  </section>
+</template>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>
