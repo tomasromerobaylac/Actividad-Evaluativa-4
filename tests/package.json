@@ -1,0 +1,6 @@
+{
+  "name": "mercado-fresco-pruebas",
+  "private": true,
+  "description": "Pruebas de la API y de accesibilidad (opcionales, no se necesitan para ejecutar el sitio)",
+  "devDependencies": { "axe-core": "^4.10.2", "playwright": "^1.50.0" }
+}
