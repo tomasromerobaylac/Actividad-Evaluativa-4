@@ -43,6 +43,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 :focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; box-shadow: 0 0 0 6px var(--foco-halo); border-radius: 3px; }
 .topbar :focus-visible, .hero :focus-visible, .pie :focus-visible, .btn-mostaza:focus-visible { outline-color: #fff; box-shadow: 0 0 0 6px var(--pino-900); }
 main:focus, h1:focus { outline: none; box-shadow: none; }
+/* Reserva el alto de la ventana para que el pie no "salte" cuando llegan los datos de la API (evita CLS) */
+main { min-height: 100vh; }
+.grilla-productos, .grilla-rubros { min-height: 320px; }
 
 .saltar-contenido { position: absolute; left: 12px; top: -80px; z-index: 100; background: var(--mostaza-500); color: var(--pino-900); padding: 10px 16px; font-weight: 700; border-radius: 0 0 6px 6px; }
 .saltar-contenido:focus-visible { top: 0; }
@@ -56,10 +59,10 @@ main:focus, h1:focus { outline: none; box-shadow: none; }
 .topbar { background: var(--pino-900); color: var(--salvia-100); font-size: .85rem; padding: 7px 0; }
 .topbar .contenedor { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; }
 .barra-nav { background: var(--papel); border-bottom: 1px solid var(--linea); }
-.barra-nav .contenedor { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-top: 10px; padding-bottom: 10px; }
+.barra-nav .contenedor { min-height: 65px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-top: 10px; padding-bottom: 10px; }
 .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--pino-900); font: 700 1.2rem var(--fuente-titulo); }
 .marca small { display: block; font: 700 .68rem var(--fuente); letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-suave); }
-.menu { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.menu { min-height: 44px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
 .menu a, .menu button { font: 600 .95rem var(--fuente); color: var(--pino-900); text-decoration: none; background: none; border: 0; padding: 10px 12px; min-height: 44px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 .menu a:hover, .menu button:hover { background: var(--salvia-100); }
 .menu a[aria-current="page"] { background: var(--pino-900); color: #fff; }
@@ -194,3 +197,6 @@ main { flex: 1; width: 100%; }
 .nombre-producto { font-size: 1.15rem; }
 [hidden] { display: none !important; }
 .tarjeta + h2 { margin-top: 1.6em; }
+
+/* El menú lo dibuja JS: en pantallas angostas ocupa dos filas; se reserva ese alto para evitar saltos de diseño (CLS). */
+@media (max-width: 600px) { .menu { min-height: 94px; align-content: flex-start; } }
