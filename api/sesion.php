@@ -6,7 +6,8 @@ require_once __DIR__ . '/lib/respuesta.php';
 // Es informativo (siempre 200): la decisión de seguridad se toma en cada endpoint protegido.
 exigirMetodo('GET');
 iniciarSesion();
-if (empty($_SESSION['usuario_id'])) {
+// Una sesión incompleta (sin nombre o rol) se trata como anónima.
+if (empty($_SESSION['usuario_id']) || !isset($_SESSION['nombre'], $_SESSION['rol'])) {
     responder(200, ['autenticado' => false, 'usuario' => null]);
 }
 responder(200, ['autenticado' => true, 'usuario' => [

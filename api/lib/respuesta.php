@@ -6,6 +6,8 @@ declare(strict_types=1);
  * Todo endpoint responde JSON (UTF-8) con un código HTTP semántico.
  */
 
+// No mostrar avisos ni errores de PHP al cliente (el detalle va al log del servidor).
+ini_set('display_errors', '0');
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
@@ -54,6 +56,8 @@ function texto(mixed $valor): ?string
 function iniciarSesion(): void
 {
     if (session_status() === PHP_SESSION_NONE) {
+        // Cookie propia de la aplicación: evita mezclar sesiones con otros proyectos en localhost.
+        session_name('MF_SESION');
         session_start([
             'cookie_httponly' => true,
             'cookie_samesite' => 'Lax',
