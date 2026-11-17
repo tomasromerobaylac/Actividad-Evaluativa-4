@@ -659,6 +659,11 @@ async function vistaAdmin(vigente) {
 async function iniciar() {
   recuperarCarrito();
   window.addEventListener('hashchange', rutear);
+  // El enlace «Saltar al contenido» no debe cambiar la ruta del hash: sólo mueve el foco a <main>.
+  $('.saltar-contenido').addEventListener('click', (e) => {
+    e.preventDefault();
+    contenido.focus();
+  });
   await consultarSesion();
   rutear();
 }
